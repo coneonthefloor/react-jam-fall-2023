@@ -1,11 +1,11 @@
+import { Link, routes } from '@redwoodjs/router'
 import Button from '../Button/Button'
 
 const HighScoreButton = () => {
   return (
-    <Button
-      children={'High Score'}
-      onClick={() => alert('Hi score button clicked')}
-    />
+    <Link to={routes.highScore()}>
+      <Button children={'High Score'} onClick={() => {}} />
+    </Link>
   )
 }
 
