@@ -14,7 +14,7 @@ const SpaceShipSelectionPage = () => {
         description="SpaceShipSelection page"
       />
 
-      <div className="flex items-center justify-between md:px-10">
+      <div className="flex items-center justify-between">
         {availableSpaceShips.map((spaceShip, i) => (
           <SpaceShipCard
             key={i}

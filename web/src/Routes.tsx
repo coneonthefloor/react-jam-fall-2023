@@ -9,17 +9,20 @@
 
 import { Router, Route, Set } from '@redwoodjs/router'
 import MenuScreenLayout from './layouts/MenuScreenLayout/MenuScreenLayout'
+import CanvasBackgroundLayout from './layouts/CanvasBackgroundLayout/CanvasBackgroundLayout'
 
 const Routes = () => {
   return (
     <Router>
-      <Set wrap={MenuScreenLayout}>
-        <Route path="/" page={StartPage} name="start" />
-        <Route path="/high-score" page={HighScorePage} name="highScore" />
-        <Route path="/space-ship-selection" page={SpaceShipSelectionPage} name="spaceShipSelection" />
+      <Set wrap={CanvasBackgroundLayout}>
+        <Set wrap={MenuScreenLayout}>
+          <Route path="/" page={StartPage} name="start" />
+          <Route path="/high-score" page={HighScorePage} name="highScore" />
+          <Route path="/space-ship-selection" page={SpaceShipSelectionPage} name="spaceShipSelection" />
+        </Set>
+        <Route path="/game" page={GamePage} name="game" />
+        <Route notfound page={NotFoundPage} />
       </Set>
-      <Route path="/game" page={GamePage} name="game" />
-      <Route notfound page={NotFoundPage} />
     </Router>
   )
 }
