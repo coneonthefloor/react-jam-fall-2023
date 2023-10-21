@@ -8,19 +8,19 @@ const HighScorePage = () => {
     <>
       <MetaTags title="HighScore" description="HighScore page" />
 
-      <div className="m750:px-5 m750:py-10 min-h-80 min-w-80 flex w-full max-w-full flex-col items-center justify-between rounded-md border-2 border-black bg-[#c9dcd8] px-10 py-10 my-10 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+      <div className="m750:px-5 m750:py-10 min-h-80 min-w-80 flex w-full max-w-full flex-col items-center justify-between rounded-md border-2 border-black bg-[#1B2947] px-10 py-10 my-10 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
         <HighScoreItem
-          imageUrl="https://a-z-animals.com/media/2022/11/shutterstock_606517310-1024x650.jpg"
+          imageUrl="https://placehold.co/60"
           spaceShipName="Scimitar X"
           score={100}
         />
         <HighScoreItem
-          imageUrl="https://a-z-animals.com/media/2022/11/shutterstock_606517310-1024x650.jpg"
+          imageUrl="https://placehold.co/60"
           spaceShipName="Kobayashi Maru"
           score={98}
         />
         <HighScoreItem
-          imageUrl="https://a-z-animals.com/media/2022/11/shutterstock_606517310-1024x650.jpg"
+          imageUrl="https://placehold.co/60"
           spaceShipName="Imperium Shield"
           score={70}
         />

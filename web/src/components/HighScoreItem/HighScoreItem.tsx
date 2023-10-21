@@ -12,7 +12,7 @@ const HighScoreItem = ({
   spaceShipName,
 }: HighScoreItemProps) => {
   return (
-    <div className='flex items-center justify-between h-16 text-2xl w-full mb-4'>
+    <div className='flex items-center justify-between h-16 text-2xl w-full mb-4 text-white'>
       <Avatar imageUrl={imageUrl} />
       <div>
         <span>{spaceShipName}</span>
