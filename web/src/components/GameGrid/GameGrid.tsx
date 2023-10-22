@@ -24,7 +24,7 @@ const GameGrid = () => {
   return (
     <div
       ref={gridRef}
-      className="grid h-[600px] w-full grid-flow-col grid-rows-3 grid-cols-3 gap-0 border-2 border-sky-300 opacity-20"
+      className="grid h-[600px] w-full grid-flow-col grid-cols-3 grid-rows-3 gap-0 border-2 border-sky-300 opacity-20"
     >
       {cells}
     </div>

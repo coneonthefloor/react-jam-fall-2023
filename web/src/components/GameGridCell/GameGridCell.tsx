@@ -1,39 +1,43 @@
-import { useRef, useEffect, useState } from 'react'
-import { disableCellRect, enableCellRect } from 'src/game.actions'
-import { useGame, useGameDispatch } from 'src/game.context'
+import { useEffect, useRef, useState } from 'react'
+import { addCell } from 'src/game.actions'
+import { useGameDispatch } from 'src/game.context'
+import { GridCell } from 'src/game/grid-cell'
 
 const disableCount = 3
 const resetCount = 10
 
 const GameGridCell = () => {
-  const state = useGame()
   const dispatch = useGameDispatch()
   const cellRef = useRef<HTMLDivElement>(null)
 
-  const disabled = state.disabledGridCellRects.some(({ x, y }) => {
-    const bounds = cellRef.current.getBoundingClientRect()
-    return bounds.x === x && bounds.y === y
-  })
-
+  const [cell, setCell] = useState(null)
   const [count, setCount] = useState(disableCount)
   const [countDown, setCountDown] = useState(false)
+
+  useEffect(() => {
+    const newCell = new GridCell(cellRef.current.getBoundingClientRect())
+    setCell(newCell)
+    dispatch(addCell(newCell))
+  }, [])
 
   const startDisableCountDown = () => {
     setCountDown(true)
     setCount(disableCount)
+    cell.pending = true
+    cell.disabled = false
   }
 
   const startResetCountDown = () => {
     setCountDown(true)
     setCount(resetCount)
-  }
-
-  const disableCell = () => {
-    dispatch(disableCellRect(cellRef.current.getBoundingClientRect()))
+    cell.disabled = true
+    cell.pending = false
   }
 
   const enableCell = () => {
-    dispatch(enableCellRect(cellRef.current.getBoundingClientRect()))
+    cell.pending = false
+    cell.disabled = false
+    setCountDown(false)
   }
 
   setTimeout(() => {
@@ -42,12 +46,14 @@ const GameGridCell = () => {
     }
   }, 1000)
 
+  if (cell?.pending && !countDown) {
+    startResetCountDown()
+  }
+
   if (count === 0 && countDown) {
-    if (!disabled) {
+    if (cell && !cell.disabled) {
       startResetCountDown()
-      disableCell()
     } else {
-      setCountDown(false)
       enableCell()
     }
   }
@@ -57,12 +63,12 @@ const GameGridCell = () => {
       ref={cellRef}
       onClick={startDisableCountDown}
       className={`flex items-center justify-center border-2 border-sky-300 ${
-        disabled ? 'bg-red-900' : ''
+        cell?.disabled ? 'bg-red-900' : ''
       }`}
     >
       <div
         className={`text-center text-8xl font-bold  ${
-          disabled ? 'text-red-300' : 'text-sky-300'
+          cell?.disabled ? 'text-red-300' : 'text-sky-300'
         }`}
       >
         {countDown ? count : ''}

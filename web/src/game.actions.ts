@@ -1,3 +1,5 @@
+import { GridCell } from './game/grid-cell'
+
 export function updateScore(score: number) {
   return <const>{
     type: 'UPDATE_SCORE',
@@ -19,25 +21,17 @@ export function setGridRect(gridRect: DOMRect) {
   }
 }
 
-export function disableCellRect(cellRect: DOMRect) {
+export function addCell(cell: GridCell) {
   return <const>{
-    type: 'DISABLE_CELL_RECT',
-    cellRect,
-  }
-}
-
-export function enableCellRect(cellRect: DOMRect) {
-  return <const>{
-    type: 'ENABLE_CELL_RECT',
-    cellRect,
+    type: 'ADD_CELL',
+    cell,
   }
 }
 
 type GameAction = ReturnType<
   | typeof updateScore
   | typeof selectSpaceShip
-  | typeof disableCellRect
-  | typeof enableCellRect
+  | typeof addCell
   | typeof setGridRect
 >
 

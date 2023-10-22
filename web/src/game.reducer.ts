@@ -9,14 +9,8 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
       return { ...state, selectedSpaceShipName: action.spaceShipName }
     case 'SET_GRID_RECT':
       return { ...state, gridRect: action.gridRect }
-    case 'DISABLE_CELL_RECT':
-      const gridCellRects = [...state.disabledGridCellRects, action.cellRect]
-      return { ...state, disabledGridCellRects: gridCellRects }
-    case 'ENABLE_CELL_RECT':
-      const filteredCells = state.disabledGridCellRects.filter(
-        ({ x, y }) => x !== action.cellRect.x && y !== action.cellRect.y
-      )
-      return { ...state, disabledGridCellRects: filteredCells }
+    case 'ADD_CELL':
+      return { ...state, gridCells: [...state.gridCells, action.cell] }
     default:
       return state
   }
