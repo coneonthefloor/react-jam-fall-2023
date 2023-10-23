@@ -16636,6 +16636,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"kaboom@npm:^3000.1.13":
+  version: 3000.1.13
+  resolution: "kaboom@npm:3000.1.13"
+  checksum: dcf1e300fb89bb991508b5f985c3118cabe01be51ff2b1e07c3fbd5992f2cbdba14a35c2052f7ae1754be64c3f4580b9fd54ab8a23e4b6a738b5c628fd2dd0bf
+  languageName: node
+  linkType: hard
+
 "keyv@npm:^3.0.0":
   version: 3.1.0
   resolution: "keyv@npm:3.1.0"
@@ -20977,7 +20984,9 @@ __metadata:
   dependencies:
     "@redwoodjs/cli-storybook": 6.3.2
     "@redwoodjs/core": 6.3.2
+    kaboom: ^3000.1.13
     prettier-plugin-tailwindcss: 0.4.1
+    web: "workspace:^"
   languageName: unknown
   linkType: soft
 
@@ -23843,7 +23852,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"web@workspace:web":
+"web@workspace:^, web@workspace:web":
   version: 0.0.0-use.local
   resolution: "web@workspace:web"
   dependencies:

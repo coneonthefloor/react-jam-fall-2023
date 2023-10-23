@@ -1,6 +1,6 @@
 import Delaunay from './delaunay'
 
-export const stars = (canvas) => {
+export const stars = (canvas, followMouse = false) => {
   /**
    * Stars
    * Inspired by Steve Courtney's poster art for Celsius GS's Drifter - http://celsiusgs.com/drifter/posters.php
@@ -147,12 +147,13 @@ export const stars = (canvas) => {
       )
     } else {
       // Mouse move listener
-      console.log('Using mouse movement')
-      document.body.addEventListener('mousemove', function (e) {
-        //console.log('moved');
-        mouse.x = e.clientX
-        mouse.y = e.clientY
-      })
+      if (followMouse) {
+        document.body.addEventListener('mousemove', function (e) {
+          //console.log('moved');
+          mouse.x = e.clientX
+          mouse.y = e.clientY
+        })
+      }
     }
 
     // Random motion

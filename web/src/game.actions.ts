@@ -28,11 +28,19 @@ export function addCell(cell: GridCell) {
   }
 }
 
+export function updateInProgress(inProgress: boolean) {
+  return <const>{
+    type: 'UPDATE_IN_PROGRESS',
+    inProgress
+  }
+}
+
 type GameAction = ReturnType<
   | typeof updateScore
   | typeof selectSpaceShip
   | typeof addCell
   | typeof setGridRect
+  | typeof updateInProgress
 >
 
 export default GameAction

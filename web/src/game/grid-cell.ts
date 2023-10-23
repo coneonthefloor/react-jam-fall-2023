@@ -7,6 +7,4 @@ export class GridCell {
   }
 
   constructor(public readonly bounds: DOMRect) {}
-
-
 }

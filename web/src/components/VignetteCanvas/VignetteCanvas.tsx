@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
-import { hsla } from 'src/game/color'
-import { isEven } from 'src/game/math'
+import { hsla } from 'src/game/core/color'
+import { isEven } from 'src/game/core/math'
 
 const drawCRTLines = (ctx: CanvasRenderingContext2D, w: number, h: number) => {
   ctx.save()

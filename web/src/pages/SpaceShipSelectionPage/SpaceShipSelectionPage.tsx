@@ -19,7 +19,7 @@ const SpaceShipSelectionPage = () => {
           <SpaceShipCard
             key={i}
             spaceShipName={spaceShip.name}
-            imageUrl="https://placehold.co/400X300"
+            imageUrl={spaceShip.name.replace(' ', '-').toLowerCase() + '.png'}
           />
         ))}
       </div>

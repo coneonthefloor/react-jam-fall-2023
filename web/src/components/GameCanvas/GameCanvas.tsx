@@ -1,8 +1,9 @@
+import { KaboomCtx } from 'kaboom'
 import { useEffect, useRef } from 'react'
 import { useGame, useGameDispatch } from 'src/game.context'
-import { Game } from 'src/game/game'
+import { createGame, updateGameState } from 'src/game/game'
 
-let game: Game
+let game: KaboomCtx
 
 const GameCanvas = () => {
   const state = useGame()
@@ -10,17 +11,10 @@ const GameCanvas = () => {
 
   useEffect(() => {
     const canvas = canvasRef.current
-
-    if (!game && state.gameInProgress) {
-      game = new Game(state, canvas)
-    }
-
-    if (game && !state.gameInProgress) {
-      game = undefined
-    }
-
-    if (game) {
-      game.setState(state)
+    if (!game) {
+      createGame(canvas, state)
+    } else {
+      updateGameState(state)
     }
   }, [state])
 
