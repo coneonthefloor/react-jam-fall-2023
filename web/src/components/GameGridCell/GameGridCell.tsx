@@ -15,7 +15,7 @@ const GameGridCell = () => {
   const [countDown, setCountDown] = useState(false)
 
   useEffect(() => {
-    const newCell = new GridCell(cellRef.current.getBoundingClientRect())
+    const newCell = new GridCell(cellRef.current)
     setCell(newCell)
     dispatch(addCell(newCell))
   }, [])

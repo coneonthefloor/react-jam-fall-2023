@@ -15,11 +15,11 @@ const SpaceShipSelectionPage = () => {
       />
 
       <div className="flex items-center justify-between">
-        {availableSpaceShips.map((spaceShip, i) => (
+        {availableSpaceShips.map((name, i) => (
           <SpaceShipCard
             key={i}
-            spaceShipName={spaceShip.name}
-            imageUrl={spaceShip.name.replace(' ', '-').toLowerCase() + '.png'}
+            spaceShipName={name}
+            imageUrl={name.replace(' ', '-').toLowerCase() + '.png'}
           />
         ))}
       </div>

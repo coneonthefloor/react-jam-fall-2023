@@ -13008,7 +13008,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eventemitter3@npm:^5.0.1":
+"eventemitter3@npm:^5.0.0, eventemitter3@npm:^5.0.1":
   version: 5.0.1
   resolution: "eventemitter3@npm:5.0.1"
   checksum: 4ba5c00c506e6c786b4d6262cfbce90ddc14c10d4667e5c83ae993c9de88aa856033994dd2b35b83e8dc1170e224e66a319fa80adc4c32adcd2379bbc75da814
@@ -16636,13 +16636,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"kaboom@npm:^3000.1.13":
-  version: 3000.1.13
-  resolution: "kaboom@npm:3000.1.13"
-  checksum: dcf1e300fb89bb991508b5f985c3118cabe01be51ff2b1e07c3fbd5992f2cbdba14a35c2052f7ae1754be64c3f4580b9fd54ab8a23e4b6a738b5c628fd2dd0bf
-  languageName: node
-  linkType: hard
-
 "keyv@npm:^3.0.0":
   version: 3.1.0
   resolution: "keyv@npm:3.1.0"
@@ -18947,6 +18940,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"phaser@npm:3.60.0":
+  version: 3.60.0
+  resolution: "phaser@npm:3.60.0"
+  dependencies:
+    eventemitter3: ^5.0.0
+  checksum: ae1e775490896baf320eeee80f0cbe585e75f94baa7b399e47cf3be4eeef1499c06ad695624621158f76835b2a829cca7e2e03fbc332ee222ff36e5f3b6c1165
+  languageName: node
+  linkType: hard
+
 "picocolors@npm:^1.0.0":
   version: 1.0.0
   resolution: "picocolors@npm:1.0.0"
@@ -20984,7 +20986,7 @@ __metadata:
   dependencies:
     "@redwoodjs/cli-storybook": 6.3.2
     "@redwoodjs/core": 6.3.2
-    kaboom: ^3000.1.13
+    phaser: 3.60.0
     prettier-plugin-tailwindcss: 0.4.1
     web: "workspace:^"
   languageName: unknown

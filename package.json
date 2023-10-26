@@ -24,7 +24,7 @@
   },
   "packageManager": "yarn@3.6.3",
   "dependencies": {
-    "kaboom": "^3000.1.13",
+    "phaser": "3.60.0",
     "web": "workspace:^"
   }
 }

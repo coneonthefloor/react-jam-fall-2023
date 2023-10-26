@@ -1,9 +1,35 @@
-class SpaceShip {
-  constructor(public name: string) {}
+enum ThrusterColor {
+  YELLOW = 'yellow',
+  PURPLE = 'purple',
 }
 
-export const imperiumShield = new SpaceShip('Imperium Shield')
-export const kobayashiMaru = new SpaceShip('Kobayashi Maru')
-export const scimitarX = new SpaceShip('Scimitar X')
+class SpaceShip {
+  static name = ''
+  spriteName = 'ship_A.png'
+  thrusterColor: ThrusterColor = ThrusterColor.PURPLE
+  thrusterOriginX = 0.5
+  thrusterOriginY = -0.25
+  health = 3
+
+  constructor() {}
+}
+
+export class ImperiumShield extends SpaceShip {
+  public static name = 'Imperium Shield'
+  spriteName = 'ship_sidesC.png'
+}
+
+export class ScimitarX extends SpaceShip {
+  public static name = 'Scimitar X'
+  spriteName = 'ship_sidesB.png'
+  thrusterOriginY = -0.1
+}
+
+export class KobayashiMaru extends SpaceShip {
+  static name = 'Kobayashi Maru'
+  spriteName = 'ship_sidesA.png'
+  thrusterColor = ThrusterColor.YELLOW
+  thrusterOriginY = -0.1
+}
 
 export default SpaceShip

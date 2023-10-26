@@ -1,143 +1,198 @@
-import kaboom, { KaboomCtx } from 'kaboom'
+import Phaser from 'phaser'
+import SpaceShip, {
+  ImperiumShield,
+  KobayashiMaru,
+  ScimitarX,
+} from './space-ship'
 import { GameState } from 'src/game.state'
 
-let k: KaboomCtx
-let state: GameState
+export class Game extends Phaser.Scene {
+  cursors: Phaser.Types.Input.Keyboard.CursorKeys
+  spaceShip: SpaceShip
+  spaceShipThrusterSprite: Phaser.GameObjects.Image
+  playerSprite: Phaser.Types.Physics.Arcade.ImageWithDynamicBody
+  gridRect: Phaser.Types.Physics.Arcade.ImageWithStaticBody
+  cells: Map<string, Phaser.Types.Physics.Arcade.ImageWithStaticBody> =
+    new Map()
+  emitter: Phaser.GameObjects.Particles.ParticleEmitter
+  graphics: Phaser.GameObjects.Graphics
 
-export const updateGameState = (newState: GameState) => {
-  state = newState
-}
+  preload() {
+    this.load.atlasXML(
+      'sprites',
+      'simpleSpace_sheet@2.png',
+      'simpleSpace_sheet@2.xml'
+    )
+  }
 
-export const createGame = (canvas: HTMLCanvasElement, newState: GameState) => {
-  updateGameState(newState)
+  create() {
+    const state = this.registry.get('state') as GameState
 
-  k = kaboom({
-    width: window.innerWidth,
-    height: window.innerHeight,
-    font: 'sans-serif',
-    canvas: canvas,
-    background: [0, 0, 0, 0],
-  })
+    this.spaceShip = this.getSelectedShip(state.selectedSpaceShipName)
+    this.playerSprite = this.physics.add.image(
+      window.innerWidth / 2,
+      window.innerHeight / 2,
+      'sprites',
+      this.spaceShip.spriteName
+    )
 
-  k.loadSpriteAtlas('simpleSpace_sheet.png', {
-    asteroid1: {
-      x: 144,
-      y: 428,
-      width: 48,
-      height: 48,
-    },
-    'Scimitar X': {
-      x: 0,
-      y: 244,
-      width: 52,
-      height: 52,
-    },
-    'Imperium Shield': {
-      x: 0,
-      y: 368,
-      width: 52,
-      height: 52,
-    },
-    'Kobayashi Maru': {
-      x: 148,
-      y: 128,
-      width: 42,
-      height: 53,
-    },
-  })
+    this.playerSprite.setScale(0.5, 0.5)
+    this.playerSprite.setDamping(true)
+    this.playerSprite.setDrag(0.7)
+    this.playerSprite.setMaxVelocity(100)
+    this.playerSprite.setCollideWorldBounds(true)
 
-  k.onUpdate(() => {
+    this.spaceShipThrusterSprite = this.add.image(
+      this.playerSprite.x,
+      this.playerSprite.y,
+      'sprites',
+      `effect_${this.spaceShip.thrusterColor}.png`
+    )
+    this.spaceShipThrusterSprite.setScale(0.25, 0.5)
+    this.spaceShipThrusterSprite.setDepth(-1)
+    this.spaceShipThrusterSprite.setVisible(false)
+    this.spaceShipThrusterSprite.setOrigin(
+      this.spaceShip.thrusterOriginX,
+      this.spaceShip.thrusterOriginY
+    )
+
+    this.cursors = this.input.keyboard.createCursorKeys()
+
+    this.gridRect = this.physics.add.staticImage(
+      state.gridRect.x + state.gridRect.width / 2,
+      state.gridRect.y + state.gridRect.height / 2,
+      'sprites',
+      'effect_purple.png'
+    )
+    this.gridRect.setBodySize(state.gridRect.width, state.gridRect.height)
+    this.gridRect.setVisible(false)
+
     for (const cell of state.gridCells) {
-      const found = k.get(cell.id)
-      if (found.length && !cell.disabled) {
-        for (const obj of found) {
-          k.destroy(obj)
-        }
-      } else if (cell.disabled) {
-        k.add([
-          cell.id,
-          cell,
-          k.pos(cell.bounds.left, cell.bounds.top),
-          k.rect(cell.bounds.width, cell.bounds.height),
-          k.area(),
-          k.body({ isStatic: true }),
-          k.opacity(0),
-        ])
+      const body = this.physics.add.staticImage(
+        cell.bounds.x + cell.bounds.width / 2,
+        cell.bounds.y + cell.bounds.height / 2,
+        'sprites',
+        'effect_purple.png'
+      )
+      body.setBodySize(cell.bounds.width, cell.bounds.height)
+      body.setVisible(false)
+      this.cells.set(cell.id, body)
+    }
+
+    this.emitter = this.add.particles(0, 0, 'sprites', {
+      frame: ['star_small.png', 'star_medium.png'],
+      lifespan: 1000,
+      speed: { min: 150, max: 250 },
+      scale: { start: 0.5, end: 0 },
+      gravityY: 0,
+      blendMode: 'ADD',
+      emitting: false,
+    })
+
+    this.graphics = this.add.graphics()
+  }
+
+  update() {
+    this.graphics.clear()
+
+    this.updatePlayer()
+  }
+
+  updatePlayer() {
+    if (!this.spaceShip.health) {
+      this.playerSprite.setVisible(false)
+      this.spaceShipThrusterSprite.setVisible(false)
+    }
+
+    if (!this.playerSprite.visible) return
+
+    const state = this.registry.get('state') as GameState
+    const collidingCells: Phaser.Types.Physics.Arcade.ImageWithStaticBody[] = []
+    for (const cell of state.gridCells) {
+      const body = this.cells.get(cell.id)
+      if (cell.disabled) {
+        collidingCells.push(body)
       }
     }
-  })
+    this.physics.world.collide(this.playerSprite, collidingCells)
 
-  const leftWall = k.add([
-    k.pos(state.gridRect.left, state.gridRect.top),
-    k.rect(1, state.gridRect.height),
-    k.area(),
-    k.body({ isStatic: true }),
-    k.opacity(0),
-  ])
+    for (const cell of collidingCells) {
+      const rectA = new Phaser.Geom.Rectangle(
+        cell.body.x,
+        cell.body.y,
+        cell.body.width,
+        cell.body.height
+      )
 
-  const rightWall = k.add([
-    k.pos(state.gridRect.right, state.gridRect.top),
-    k.rect(1, state.gridRect.height),
-    k.area(),
-    k.body({ isStatic: true }),
-    k.opacity(0),
-  ])
+      if (
+        this.spaceShip.health &&
+        rectA.contains(this.playerSprite.x, this.playerSprite.y)
+      ) {
+        this.spaceShip.health = 0
+        this.explode()
+      }
+    }
 
-  const topWall = k.add([
-    k.pos(state.gridRect.left, state.gridRect.top),
-    k.rect(state.gridRect.width, 1),
-    k.area(),
-    k.body({ isStatic: true }),
-    k.opacity(0),
-  ])
+    const rect = new Phaser.Geom.Rectangle(
+      this.gridRect.body.x,
+      this.gridRect.body.y,
+      this.gridRect.body.width,
+      this.gridRect.body.height
+    )
+    if (
+      this.spaceShip.health &&
+      !rect.contains(this.playerSprite.x, this.playerSprite.y)
+    ) {
+      this.spaceShip.health = 0
+      this.explode()
+    }
 
-  const bottomWall = k.add([
-    k.pos(state.gridRect.left, state.gridRect.bottom),
-    k.rect(state.gridRect.width, 1),
-    k.area(),
-    k.body({ isStatic: true }),
-    k.opacity(0),
-  ])
+    if (this.cursors.up.isDown) {
+      this.spaceShipThrusterSprite.setVisible(true)
+      this.updateThrusterPosition()
+      this.physics.velocityFromRotation(
+        this.playerSprite.rotation - 1.570796, // - 90 deg
+        100,
+        this.playerSprite.body.acceleration
+      )
+    } else {
+      this.spaceShipThrusterSprite.setVisible(false)
+      this.playerSprite.setAcceleration(0)
+    }
 
-  const player = k.add([
-    {
-      speed: 400,
-    },
-    k.anchor('center'),
-    k.pos(
-      state.gridRect.left + state.gridRect.width / 2,
-      state.gridRect.bottom - state.gridRect.height / 2
-    ),
-    k.sprite(state.selectedSpaceShipName),
-    k.body(),
-    k.area(),
-  ])
+    if (this.cursors.left.isDown) {
+      this.playerSprite.setAngularVelocity(-300)
+    } else if (this.cursors.right.isDown) {
+      this.playerSprite.setAngularVelocity(300)
+    } else {
+      this.playerSprite.setAngularVelocity(0)
+    }
 
-  player.onKeyDown('left', () => {
-    if (player.checkCollision(leftWall)) return
-    player.move(-player.speed, 0)
-  })
-  player.onKeyDown('right', () => {
-    if (player.checkCollision(rightWall)) return
-    player.move(player.speed, 0)
-  })
-  player.onKeyDown('up', () => {
-    if (player.checkCollision(topWall)) return
-    player.move(0, -player.speed)
-  })
-  player.onKeyDown('down', () => {
-    if (player.checkCollision(bottomWall)) return
-    player.move(0, player.speed)
-  })
+    this.physics.world.wrap(this.playerSprite, 32)
+  }
 
-  // const asteroids = []
+  updateThrusterPosition() {
+    this.spaceShipThrusterSprite.setRotation(this.playerSprite.rotation)
+    this.spaceShipThrusterSprite.setX(this.playerSprite.x)
+    this.spaceShipThrusterSprite.setY(this.playerSprite.y)
+  }
 
-  // const asteroid = k.add([
-  //   k.pos(state.gridRect.left + 50, state.gridRect.top + 50),
-  //   k.area(),
-  //   k.sprite('asteroid1'),
-  //   k.body(),
-  // ])
+  getSelectedShip(spaceShipName: string): SpaceShip {
+    switch (spaceShipName) {
+      case ImperiumShield.name:
+        return new ImperiumShield()
+      case KobayashiMaru.name:
+        return new KobayashiMaru()
+      case ScimitarX.name:
+        return new ScimitarX()
+    }
 
-  return k
+    return new SpaceShip()
+  }
+
+  explode() {
+    this.emitter.setX(this.playerSprite.x)
+    this.emitter.setY(this.playerSprite.y)
+    this.emitter.explode(30)
+  }
 }

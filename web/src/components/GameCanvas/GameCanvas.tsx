@@ -1,9 +1,8 @@
-import { KaboomCtx } from 'kaboom'
 import { useEffect, useRef } from 'react'
-import { useGame, useGameDispatch } from 'src/game.context'
-import { createGame, updateGameState } from 'src/game/game'
+import { useGame } from 'src/game.context'
+import getConfig from 'src/game/config'
 
-let game: KaboomCtx
+let game
 
 const GameCanvas = () => {
   const state = useGame()
@@ -11,11 +10,12 @@ const GameCanvas = () => {
 
   useEffect(() => {
     const canvas = canvasRef.current
+
     if (!game) {
-      createGame(canvas, state)
-    } else {
-      updateGameState(state)
+      game = new Phaser.Game(getConfig(canvas))
     }
+
+    game.registry.set('state', state)
   }, [state])
 
   return <canvas ref={canvasRef} className="fixed h-full w-full"></canvas>

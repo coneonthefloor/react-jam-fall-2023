@@ -1,6 +1,6 @@
 <TextureAtlas imagePath="simpleSpace_sheet@2.png">
-	<SubTexture name="effect_purple.png" x="688" y="160" width="64" height="127"/>
-	<SubTexture name="effect_yellow.png" x="608" y="0" width="64" height="127"/>
+	<SubTexture name="effect_purple.png" x="689" y="160" width="62" height="126"/>
+	<SubTexture name="effect_yellow.png" x="609" y="0" width="62" height="126"/>
 	<SubTexture name="enemy_A.png" x="400" y="256" width="96" height="96"/>
 	<SubTexture name="enemy_B.png" x="496" y="192" width="96" height="96"/>
 	<SubTexture name="enemy_C.png" x="0" y="0" width="128" height="64"/>
@@ -36,9 +36,9 @@
 	<SubTexture name="ship_J.png" x="224" y="96" width="96" height="96"/>
 	<SubTexture name="ship_K.png" x="736" y="0" width="64" height="96"/>
 	<SubTexture name="ship_L.png" x="208" y="352" width="96" height="96"/>
-	<SubTexture name="ship_sidesA.png" x="592" y="384" width="84" height="106"/>
+	<SubTexture name="ship_sidesA.png" x="593" y="385" width="82" height="106"/>
 	<SubTexture name="ship_sidesB.png" x="120" y="64" width="104" height="104"/>
-	<SubTexture name="ship_sidesC.png" x="104" y="384" width="104" height="104"/>
+	<SubTexture name="ship_sidesC.png" x="105" y="385" width="103" height="104"/>
 	<SubTexture name="ship_sidesD.png" x="128" y="0" width="96" height="64"/>
 	<SubTexture name="star_large.png" x="208" y="256" width="96" height="96"/>
 	<SubTexture name="star_medium.png" x="224" y="0" width="96" height="96"/>
