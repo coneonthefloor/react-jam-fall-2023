@@ -1,5 +1,5 @@
 import { MetaTags } from '@redwoodjs/web'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import GameCanvas from 'src/components/GameCanvas/GameCanvas'
 import GameGrid from 'src/components/GameGrid/GameGrid'
 import GameOverCard from 'src/components/GameOverCard/GameOverCard'
@@ -21,9 +21,7 @@ const GamePage = () => {
       <div className="mx-auto flex h-screen max-w-full items-center justify-center md:max-w-screen-md lg:w-8/12">
         <GameCanvas />
         <GameGrid />
-        {state.gameInProgress ? (
-          ''
-        ) : (
+        {state.gameInProgress ? null : (
           <GameOverCard
             score={state.score}
             shipName={state.selectedSpaceShipName}

@@ -3,7 +3,7 @@ import { ImperiumShield, KobayashiMaru, ScimitarX } from './game/space-ship'
 
 const initialGameState = {
   score: 0,
-  gameInProgress: false,
+  gameInProgress: true,
   selectedSpaceShipName: ImperiumShield.name,
   availableSpaceShips: [
     ImperiumShield.name,
