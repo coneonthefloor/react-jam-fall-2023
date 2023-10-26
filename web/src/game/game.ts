@@ -5,8 +5,10 @@ import SpaceShip, {
   ScimitarX,
 } from './space-ship'
 import { GameState } from 'src/game.state'
+import { updateInProgress } from 'src/game.actions'
 
 export class Game extends Phaser.Scene {
+  gameOver = false
   cursors: Phaser.Types.Input.Keyboard.CursorKeys
   spaceShip: SpaceShip
   spaceShipThrusterSprite: Phaser.GameObjects.Image
@@ -96,6 +98,10 @@ export class Game extends Phaser.Scene {
     this.graphics.clear()
 
     this.updatePlayer()
+
+    if (!this.spaceShip.health) {
+      this.endGame()
+    }
   }
 
   updatePlayer() {
@@ -194,5 +200,14 @@ export class Game extends Phaser.Scene {
     this.emitter.setX(this.playerSprite.x)
     this.emitter.setY(this.playerSprite.y)
     this.emitter.explode(30)
+  }
+
+  endGame() {
+    this.gameOver = true
+
+    setTimeout(() => {
+      this.registry.set('gameOver', true)
+      this.registry.get('dispatch')(updateInProgress(false))
+    }, 2000)
   }
 }
