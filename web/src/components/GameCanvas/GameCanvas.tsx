@@ -27,7 +27,7 @@ const GameCanvas = () => {
     }
   }, [state])
 
-  return <canvas ref={canvasRef} className="fixed h-full w-full"></canvas>
+  return <canvas ref={canvasRef} className="fixed h-full w-full pointer-events-none"></canvas>
 }
 
 export default GameCanvas
