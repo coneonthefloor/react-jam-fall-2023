@@ -58,7 +58,7 @@ const VignetteCanvas = () => {
   return (
     <canvas
       ref={canvasRef}
-      className="pointer-events-none fixed left-0 top-0 h-screen w-screen"
+      className="pointer-events-none fixed left-0 top-0 h-screen w-screen z-10"
     ></canvas>
   )
 }

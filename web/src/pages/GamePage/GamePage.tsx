@@ -25,11 +25,11 @@ const GamePage = () => {
 
       <div className="mx-auto flex flex-col h-screen max-w-full items-center justify-center md:max-w-screen-md lg:w-8/12">
         <GameCanvas />
-        <div className='mb-2 w-full'>
+        <div className='mb-2 w-full z-10'>
           <StatsPanel />
         </div>
         <GameGrid />
-        <div className='mt-2 w-full'>
+        <div className='mt-2 w-full z-10'>
           <UpgradePanel upgrades={ship.upgrades} />
         </div>
         {state.gameInProgress ? null : (

@@ -6,6 +6,8 @@ import SpaceShip, {
 } from './space-ship'
 import { GameState } from 'src/game.state'
 import { updateInProgress } from 'src/game.actions'
+import { randomInt, sample } from './core/random'
+import Asteroid from './asteroid'
 
 export class Game extends Phaser.Scene {
   gameOver = false
@@ -18,6 +20,7 @@ export class Game extends Phaser.Scene {
     new Map()
   emitter: Phaser.GameObjects.Particles.ParticleEmitter
   graphics: Phaser.GameObjects.Graphics
+  asteroids: Asteroid[] = []
 
   preload() {
     this.load.atlasXML(
@@ -92,12 +95,15 @@ export class Game extends Phaser.Scene {
     })
 
     this.graphics = this.add.graphics()
+
+    this.generateAsteroid()
   }
 
   update() {
     this.graphics.clear()
 
     this.updatePlayer()
+    this.asteroids.forEach((_) => _.update(this.physics))
 
     if (!this.spaceShip.health) {
       this.endGame()
@@ -135,7 +141,7 @@ export class Game extends Phaser.Scene {
         rectA.contains(this.playerSprite.x, this.playerSprite.y)
       ) {
         this.spaceShip.health = 0
-        this.explode()
+        this.explodePlayer()
       }
     }
 
@@ -150,7 +156,7 @@ export class Game extends Phaser.Scene {
       !rect.contains(this.playerSprite.x, this.playerSprite.y)
     ) {
       this.spaceShip.health = 0
-      this.explode()
+      this.explodePlayer()
     }
 
     if (this.cursors.up.isDown) {
@@ -196,7 +202,7 @@ export class Game extends Phaser.Scene {
     return new SpaceShip()
   }
 
-  explode() {
+  explodePlayer() {
     this.emitter.setX(this.playerSprite.x)
     this.emitter.setY(this.playerSprite.y)
     this.emitter.explode(30)
@@ -209,5 +215,28 @@ export class Game extends Phaser.Scene {
       this.registry.set('gameOver', true)
       this.registry.get('dispatch')(updateInProgress(false))
     }, 2000)
+  }
+
+  generateAsteroid() {
+    const variants = [
+      'meteor_detailedLarge.png',
+      'meteor_detailedSmall.png',
+      'meteor_large.png',
+      'meteor_small.png',
+      'meteor_squareDetailedLarge.png',
+      'meteor_squareDetailedSmall.png',
+      'meteor_squareLarge.png',
+      'meteor_squareSmall.png',
+    ]
+    const y = randomInt(0, this.game.canvas.height)
+    const asteroidSprite = this.add.sprite(0, y, 'sprites', sample(variants))
+    const destinationCell = sample(Array.from(this.cells.values()))
+    const asteroid = new Asteroid(asteroidSprite, {
+      x: this.game.canvas.width + asteroidSprite.width,
+      y: 1000,
+    })
+    asteroid.vx = 2
+    asteroid.vr = 0.02
+    this.asteroids.push(asteroid)
   }
 }
