@@ -6,8 +6,8 @@ import SpaceShip, {
 } from './space-ship'
 import { GameState } from 'src/game.state'
 import { updateInProgress } from 'src/game.actions'
-import { randomInt, sample } from './core/random'
-import Asteroid from './asteroid'
+import { choose, randomInt, sample } from './core/random'
+import Asteroid, { AsteroidOrigin } from './asteroid'
 
 export class Game extends Phaser.Scene {
   gameOver = false
@@ -103,7 +103,25 @@ export class Game extends Phaser.Scene {
     this.graphics.clear()
 
     this.updatePlayer()
-    this.asteroids.forEach((_) => _.update(this.physics))
+
+    for (const activeAsteroid of this.asteroids.filter((_) => _.active)) {
+      activeAsteroid.update(this.physics)
+
+      if (this.physics.overlap(this.playerSprite, activeAsteroid.sprite)) {
+        this.spaceShip.damage(this.registry.get('dispatch'))
+      }
+    }
+
+    for (const asteroid of this.asteroids) {
+      if (
+        (asteroid.sprite.x < -asteroid.sprite.width &&
+          asteroid.origin === AsteroidOrigin.RIGHT) ||
+        (asteroid.sprite.x > this.game.canvas.width &&
+          asteroid.origin === AsteroidOrigin.LEFT)
+      ) {
+        this.setUpAsteroid(asteroid)
+      }
+    }
 
     if (!this.spaceShip.health) {
       this.endGame()
@@ -111,9 +129,10 @@ export class Game extends Phaser.Scene {
   }
 
   updatePlayer() {
-    if (!this.spaceShip.health) {
+    if (!this.spaceShip.health && this.playerSprite.visible) {
       this.playerSprite.setVisible(false)
       this.spaceShipThrusterSprite.setVisible(false)
+      this.explodePlayer()
     }
 
     if (!this.playerSprite.visible) return
@@ -141,7 +160,6 @@ export class Game extends Phaser.Scene {
         rectA.contains(this.playerSprite.x, this.playerSprite.y)
       ) {
         this.spaceShip.health = 0
-        this.explodePlayer()
       }
     }
 
@@ -217,7 +235,7 @@ export class Game extends Phaser.Scene {
     }, 2000)
   }
 
-  generateAsteroid() {
+  setUpAsteroid(asteroid: Asteroid) {
     const variants = [
       'meteor_detailedLarge.png',
       'meteor_detailedSmall.png',
@@ -228,15 +246,31 @@ export class Game extends Phaser.Scene {
       'meteor_squareLarge.png',
       'meteor_squareSmall.png',
     ]
-    const y = randomInt(0, this.game.canvas.height)
+    asteroid.active = true
+    asteroid.origin = choose(AsteroidOrigin.LEFT, AsteroidOrigin.RIGHT)
+    const y = randomInt(100, this.game.canvas.height - 100)
+    if (asteroid.sprite) {
+      asteroid.sprite.destroy()
+    }
     const asteroidSprite = this.add.sprite(0, y, 'sprites', sample(variants))
+    asteroid.sprite = asteroidSprite
     const destinationCell = sample(Array.from(this.cells.values()))
-    const asteroid = new Asteroid(asteroidSprite, {
-      x: this.game.canvas.width + asteroidSprite.width,
-      y: 1000,
-    })
-    asteroid.vx = 2
+    let x = this.game.canvas.width + asteroidSprite.width
+    if (asteroid.origin === AsteroidOrigin.RIGHT) {
+      x = -asteroidSprite.width
+      asteroid.sprite.x = this.game.canvas.width
+    }
+    asteroid.destination = {
+      x,
+      y: destinationCell.y + destinationCell.height / 2,
+    }
     asteroid.vr = 0.02
-    this.asteroids.push(asteroid)
+    asteroid.speed = randomInt(100, 300)
+    return asteroid
+  }
+
+  generateAsteroid() {
+    const asteroid = new Asteroid()
+    this.asteroids.push(this.setUpAsteroid(asteroid))
   }
 }

@@ -31,7 +31,21 @@ export function addCell(cell: GridCell) {
 export function updateInProgress(inProgress: boolean) {
   return <const>{
     type: 'UPDATE_IN_PROGRESS',
-    inProgress
+    inProgress,
+  }
+}
+
+export function updateHealth(health: number) {
+  return <const>{
+    type: 'UPDATE_HEALTH',
+    health,
+  }
+}
+
+export function updateGold(gold: number) {
+  return <const>{
+    type: 'UPDATE_GOLD',
+    gold,
   }
 }
 
@@ -41,6 +55,8 @@ type GameAction = ReturnType<
   | typeof addCell
   | typeof setGridRect
   | typeof updateInProgress
+  | typeof updateGold
+  | typeof updateHealth
 >
 
 export default GameAction

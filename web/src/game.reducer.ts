@@ -5,6 +5,10 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
   switch (action.type) {
     case 'UPDATE_SCORE':
       return { ...state, score: action.score }
+    case 'UPDATE_GOLD':
+      return { ...state, gold: action.gold }
+    case 'UPDATE_HEALTH':
+      return { ...state, health: action.health }
     case 'UPDATE_IN_PROGRESS':
       return { ...state, gameInProgress: action.inProgress }
     case 'SELECT_SPACE_SHIP':

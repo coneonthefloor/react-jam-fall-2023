@@ -1,3 +1,5 @@
+import { updateHealth } from 'src/game.actions'
+
 enum ThrusterColor {
   YELLOW = 'yellow',
   PURPLE = 'purple',
@@ -33,6 +35,18 @@ class SpaceShip {
       this.speed += 50
     }),
   ]
+
+  inDamageCooldown = false
+  damage(dispatch: any) {
+    if (!this.inDamageCooldown) {
+      this.health -= 1
+      dispatch(updateHealth(this.health))
+      this.inDamageCooldown = true
+      setTimeout(() => {
+        this.inDamageCooldown = false
+      }, 1000)
+    }
+  }
 }
 
 export class ImperiumShield extends SpaceShip {
