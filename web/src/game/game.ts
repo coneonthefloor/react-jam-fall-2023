@@ -367,12 +367,29 @@ export class Game extends Phaser.Scene {
   }
 
   endGame() {
-    this.gameOver = true
+    if (!this.gameOver) {
+      setTimeout(() => {
+        this.registry.set('gameOver', true)
+        this.registry.get('dispatch')(updateInProgress(false))
 
-    setTimeout(() => {
-      this.registry.set('gameOver', true)
-      this.registry.get('dispatch')(updateInProgress(false))
-    }, 2000)
+        const state = this.registry.get('state') as GameState
+        const previousScores = window.localStorage.getItem('scores')
+        if (!previousScores) {
+          const data = JSON.stringify([
+            { score: state.score, spaceShip: state.selectedSpaceShipName },
+          ])
+          window.localStorage.setItem('scores', data)
+        } else {
+          const data = JSON.parse(previousScores)
+          data.push({
+            score: state.score,
+            spaceShip: state.selectedSpaceShipName,
+          })
+          window.localStorage.setItem('scores', JSON.stringify(data))
+        }
+      }, 2000)
+    }
+    this.gameOver = true
   }
 
   setUpAsteroid(asteroid: Asteroid) {
