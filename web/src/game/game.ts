@@ -8,6 +8,7 @@ import { GameState } from 'src/game.state'
 import { updateGold, updateInProgress } from 'src/game.actions'
 import { choose, randomInt, sample } from './core/random'
 import Asteroid, { AsteroidOrigin } from './asteroid'
+import Bullet from './bullet'
 
 export class Game extends Phaser.Scene {
   gameOver = false
@@ -22,6 +23,8 @@ export class Game extends Phaser.Scene {
   asteroidParticles: Phaser.GameObjects.Particles.ParticleEmitter
   graphics: Phaser.GameObjects.Graphics
   asteroids: Asteroid[] = []
+
+  bullets: Phaser.GameObjects.Group
 
   preload() {
     this.load.atlasXML(
@@ -118,17 +121,61 @@ export class Game extends Phaser.Scene {
       if (this.asteroids.length >= 5) {
         clearInterval(interval)
       }
-    }, 3000)
+    }, 5000)
+
+    this.bullets = this.physics.add.group({
+      classType: Bullet,
+      maxSize: 10,
+      runChildUpdate: true,
+    })
   }
 
-  update() {
+  lastFired = 0
+
+  update(time: number) {
     this.graphics.clear()
 
     this.updatePlayer()
 
     if (this.spaceShip.health) {
+      if (time > this.lastFired + this.spaceShip.fireRate) {
+        const bullet = this.bullets.get()
+
+        if (bullet) {
+          const vec = this.physics.velocityFromAngle(
+            this.playerSprite.angle + 90,
+            1
+          )
+
+          const vx = vec.x * 10
+          const vy = vec.y * 10
+
+          bullet.fire(
+            this.playerSprite.x,
+            this.playerSprite.y,
+            vx,
+            vy,
+            this.playerSprite.rotation
+          )
+
+          this.lastFired = time + 50
+        }
+      }
+
       for (const activeAsteroid of this.asteroids.filter((_) => _.active)) {
         activeAsteroid.update(this.physics)
+
+        for(const bullet of this.bullets.children.getArray()) {
+          if(this.physics.overlap(bullet, activeAsteroid.sprite)) {
+            this.addCoinDrop(activeAsteroid)
+            this.asteroidParticles.explode(
+              5,
+              activeAsteroid.sprite.x,
+              activeAsteroid.sprite.y
+            )
+            this.setUpAsteroid(activeAsteroid)
+          }
+        }
 
         if (this.physics.overlap(this.playerSprite, activeAsteroid.sprite)) {
           this.addCoinDrop(activeAsteroid)

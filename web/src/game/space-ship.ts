@@ -23,6 +23,7 @@ class SpaceShip {
   hasShield = false
   blasterCount = 1
   speed = 100
+  fireRate = 1000
 
   upgrades = [
     new SpaceShipUpgrade('Shield', 5, () => {
