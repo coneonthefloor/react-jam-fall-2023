@@ -5,7 +5,7 @@ import SpaceShip, {
   ScimitarX,
 } from './space-ship'
 import { GameState } from 'src/game.state'
-import { updateGold, updateInProgress } from 'src/game.actions'
+import { updateGold, updateInProgress, updateScore } from 'src/game.actions'
 import { choose, randomInt, sample } from './core/random'
 import Asteroid, { AsteroidOrigin } from './asteroid'
 import Bullet from './bullet'
@@ -165,8 +165,8 @@ export class Game extends Phaser.Scene {
       for (const activeAsteroid of this.asteroids.filter((_) => _.active)) {
         activeAsteroid.update(this.physics)
 
-        for(const bullet of this.bullets.children.getArray()) {
-          if(this.physics.overlap(bullet, activeAsteroid.sprite)) {
+        for (const bullet of this.bullets.children.getArray() as Bullet[]) {
+          if (this.physics.overlap(bullet, activeAsteroid.sprite)) {
             this.addCoinDrop(activeAsteroid)
             this.asteroidParticles.explode(
               5,
@@ -174,6 +174,12 @@ export class Game extends Phaser.Scene {
               activeAsteroid.sprite.y
             )
             this.setUpAsteroid(activeAsteroid)
+
+            this.registry.get('dispatch')(
+              updateScore(this.registry.get('state').score + 1)
+            )
+
+            bullet.lifespan = 0
           }
         }
 
