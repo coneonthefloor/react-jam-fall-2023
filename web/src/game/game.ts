@@ -37,9 +37,17 @@ export class Game extends Phaser.Scene {
       'simpleSpace_sheet@2.png',
       'simpleSpace_sheet@2.xml'
     )
+    this.load.audio('asteroid-explode', 'sfx/asteroid-explode.wav')
+    this.load.audio('player-death', 'sfx/player-death.mp3')
+    this.load.audio('shoot', 'sfx/shoot.wav')
+    this.load.audio('upgrade', 'sfx/upgrade.wav')
+    this.load.audio('coin-pickup', 'sfx/coin-pickup.wav')
+    this.load.audio('music', 'sfx/music.mp3')
+    this.load.audio('thruster', 'sfx/thruster.mp3')
   }
 
   create() {
+    this.sound.play('music', { volume: 0.2, loop: true })
     const state = this.registry.get('state') as GameState
 
     this.spaceShip = this.getSelectedShip(state.selectedSpaceShipName)
@@ -52,6 +60,7 @@ export class Game extends Phaser.Scene {
         if (state.gold >= upgrade.cost) {
           this.registry.get('dispatch')(updateGold(state.gold - upgrade.cost))
           upgrade.action()
+          this.sound.play('upgrade')
           this.registry.get('dispatch')(updateHealth(this.spaceShip.health))
         }
       })
@@ -131,6 +140,12 @@ export class Game extends Phaser.Scene {
       emitting: false,
     })
 
+    this.asteroidParticles.on('explode', () => {
+      setTimeout(() => {
+        this.sound.play('asteroid-explode', { volume: 0.3 })
+      }, 200)
+    })
+
     this.graphics = this.add.graphics()
 
     this.generateAsteroid()
@@ -176,6 +191,8 @@ export class Game extends Phaser.Scene {
             vy,
             this.playerSprite.rotation
           )
+
+          this.sound.play('shoot', { volume: 0.5, detune: 50 })
 
           this.lastFired = time + 50
         }
@@ -258,6 +275,7 @@ export class Game extends Phaser.Scene {
           this.coins.splice(index, 1)
           coinRect.destroy()
           coinText.destroy()
+          this.sound.play('coin-pickup')
         }
       }
     }
@@ -290,6 +308,7 @@ export class Game extends Phaser.Scene {
       this.playerSprite.setVisible(false)
       this.spaceShipThrusterSprite.setVisible(false)
       this.explodePlayer()
+      this.sound.play('player-death')
     }
 
     if (!this.playerSprite.visible) return
@@ -344,7 +363,9 @@ export class Game extends Phaser.Scene {
         100,
         this.playerSprite.body.acceleration
       )
+      this.sound.play('thruster', { volume: 0.5 })
     } else {
+      this.sound.stopByKey('thruster')
       this.spaceShipThrusterSprite.setVisible(false)
       this.playerSprite.setAcceleration(0)
     }
