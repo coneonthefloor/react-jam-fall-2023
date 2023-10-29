@@ -5,7 +5,12 @@ import SpaceShip, {
   ScimitarX,
 } from './space-ship'
 import { GameState } from 'src/game.state'
-import { updateGold, updateInProgress, updateScore } from 'src/game.actions'
+import {
+  updateGold,
+  updateHealth,
+  updateInProgress,
+  updateScore,
+} from 'src/game.actions'
 import { choose, randomInt, sample } from './core/random'
 import Asteroid, { AsteroidOrigin } from './asteroid'
 import Bullet from './bullet'
@@ -38,6 +43,20 @@ export class Game extends Phaser.Scene {
     const state = this.registry.get('state') as GameState
 
     this.spaceShip = this.getSelectedShip(state.selectedSpaceShipName)
+    ;(window as any).spaceShip = this.spaceShip
+
+    for (const [index, upgrade] of this.spaceShip.upgrades.entries()) {
+      const eventName = index === 0 ? 'ONE' : index === 1 ? 'TWO' : 'THREE'
+      this.input.keyboard.on('keyup-' + eventName, () => {
+        const state = this.registry.get('state') as GameState
+        if (state.gold >= upgrade.cost) {
+          this.registry.get('dispatch')(updateGold(state.gold - upgrade.cost))
+          upgrade.action()
+          this.registry.get('dispatch')(updateHealth(this.spaceShip.health))
+        }
+      })
+    }
+
     this.playerSprite = this.physics.add.image(
       window.innerWidth / 2,
       window.innerHeight / 2,

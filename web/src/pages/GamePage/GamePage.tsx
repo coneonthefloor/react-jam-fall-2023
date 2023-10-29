@@ -12,24 +12,29 @@ import SpaceShip from 'src/game/space-ship'
 const GamePage = () => {
   const state = useGame()
   const dispatch = useGameDispatch()
+  const [ship, setShip] = useState(new SpaceShip())
 
   useEffect(() => {
     dispatch(updateInProgress(true))
   }, [])
 
-  const ship = new SpaceShip()
+  useEffect(() => {
+    if ((window as any).spaceShip) {
+      setShip((window as any).spaceShip)
+    }
+  }, [state])
 
   return (
     <>
       <MetaTags title="Game" description="Game page" />
 
-      <div className="mx-auto flex flex-col h-screen max-w-full items-center justify-center md:max-w-screen-md lg:w-8/12">
+      <div className="mx-auto flex h-screen max-w-full flex-col items-center justify-center md:max-w-screen-md lg:w-8/12">
         <GameCanvas />
-        <div className='mb-2 w-full z-10'>
+        <div className="z-10 mb-2 w-full">
           <StatsPanel />
         </div>
         <GameGrid />
-        <div className='mt-2 w-full z-10'>
+        <div className="z-10 mt-2 w-full">
           <UpgradePanel upgrades={ship.upgrades} />
         </div>
         {state.gameInProgress ? null : (

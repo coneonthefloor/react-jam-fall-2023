@@ -9,8 +9,13 @@ export class SpaceShipUpgrade {
   constructor(
     public name: string,
     public cost: number,
-    public callback: () => void
+    private callback: () => void
   ) {}
+
+  action() {
+    this.cost = this.cost * 2
+    this.callback()
+  }
 }
 
 class SpaceShip {
@@ -26,14 +31,14 @@ class SpaceShip {
   fireRate = 1000
 
   upgrades = [
-    new SpaceShipUpgrade('Shield', 5, () => {
-      this.hasShield = true
+    new SpaceShipUpgrade('Heal', 10, () => {
+      this.health = 3
     }),
-    new SpaceShipUpgrade('Blaster', 3, () => {
-      this.blasterCount += 1
+    new SpaceShipUpgrade('Fire Rate', 5, () => {
+      this.fireRate -= 200
     }),
-    new SpaceShipUpgrade('Speed', 6, () => {
-      this.speed += 50
+    new SpaceShipUpgrade('Speed', 5, () => {
+      this.speed += 100
     }),
   ]
 

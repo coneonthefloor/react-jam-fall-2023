@@ -19,7 +19,7 @@ const UpgradePanel = ({ upgrades }: UpgradePanelProps) => {
                 <Badge badgeText={(i + 1).toString()} />
               </div>
               <div className='w-[85%]'>
-                <Button  children={text} onClick={upgrade.callback} />
+                <Button  children={text} onClick={upgrade.action} />
               </div>
             </div>
           </React.Fragment>
