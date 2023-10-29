@@ -5,7 +5,7 @@ import SpaceShip, {
   ScimitarX,
 } from './space-ship'
 import { GameState } from 'src/game.state'
-import { updateInProgress } from 'src/game.actions'
+import { updateGold, updateInProgress } from 'src/game.actions'
 import { choose, randomInt, sample } from './core/random'
 import Asteroid, { AsteroidOrigin } from './asteroid'
 
@@ -126,56 +126,90 @@ export class Game extends Phaser.Scene {
 
     this.updatePlayer()
 
-    for (const activeAsteroid of this.asteroids.filter((_) => _.active)) {
-      activeAsteroid.update(this.physics)
+    if (this.spaceShip.health) {
+      for (const activeAsteroid of this.asteroids.filter((_) => _.active)) {
+        activeAsteroid.update(this.physics)
 
-      if (this.physics.overlap(this.playerSprite, activeAsteroid.sprite)) {
-        this.spaceShip.damage(this.registry.get('dispatch'))
-        this.asteroidParticles.explode(
-          5,
-          activeAsteroid.sprite.x,
-          activeAsteroid.sprite.y
-        )
-        this.setUpAsteroid(activeAsteroid)
-      } else {
-        const otherAsteroids = this.asteroids.filter(
-          (_) => _.id !== activeAsteroid.id
-        )
-        for (const otherAsteroid of otherAsteroids) {
-          if (
-            this.physics.overlap(activeAsteroid.sprite, otherAsteroid.sprite)
-          ) {
-            this.asteroidParticles.explode(
-              5,
-              activeAsteroid.sprite.x,
-              activeAsteroid.sprite.y
-            )
-            this.asteroidParticles.explode(
-              5,
-              otherAsteroid.sprite.x,
-              otherAsteroid.sprite.y
-            )
+        if (this.physics.overlap(this.playerSprite, activeAsteroid.sprite)) {
+          this.addCoinDrop(activeAsteroid)
+          this.spaceShip.damage(this.registry.get('dispatch'))
+          this.asteroidParticles.explode(
+            5,
+            activeAsteroid.sprite.x,
+            activeAsteroid.sprite.y
+          )
+          this.setUpAsteroid(activeAsteroid)
+        } else {
+          const otherAsteroids = this.asteroids.filter(
+            (_) => _.id !== activeAsteroid.id
+          )
+          for (const otherAsteroid of otherAsteroids) {
+            if (
+              this.physics.overlap(activeAsteroid.sprite, otherAsteroid.sprite)
+            ) {
+              this.addCoinDrop(activeAsteroid)
 
-            this.setUpAsteroid(otherAsteroid)
-            this.setUpAsteroid(activeAsteroid)
+              this.asteroidParticles.explode(
+                5,
+                activeAsteroid.sprite.x,
+                activeAsteroid.sprite.y
+              )
+              this.asteroidParticles.explode(
+                5,
+                otherAsteroid.sprite.x,
+                otherAsteroid.sprite.y
+              )
+
+              this.setUpAsteroid(otherAsteroid)
+              this.setUpAsteroid(activeAsteroid)
+            }
           }
         }
       }
-    }
 
-    for (const asteroid of this.asteroids) {
-      if (
-        (asteroid.sprite.x < -asteroid.sprite.width &&
-          asteroid.origin === AsteroidOrigin.RIGHT) ||
-        (asteroid.sprite.x > this.game.canvas.width &&
-          asteroid.origin === AsteroidOrigin.LEFT)
-      ) {
-        this.setUpAsteroid(asteroid)
+      for (const asteroid of this.asteroids) {
+        if (
+          (asteroid.sprite.x < -asteroid.sprite.width &&
+            asteroid.origin === AsteroidOrigin.RIGHT) ||
+          (asteroid.sprite.x > this.game.canvas.width &&
+            asteroid.origin === AsteroidOrigin.LEFT)
+        ) {
+          this.setUpAsteroid(asteroid)
+        }
+      }
+
+      for (const [index, [coinRect, coinText]] of this.coins.entries()) {
+        if (coinRect.hitTest(this.playerSprite.x, this.playerSprite.y)) {
+          const dispatch = this.registry.get('dispatch')
+          const state = this.registry.get('state')
+          dispatch(updateGold(state.gold + 5))
+          this.coins.splice(index, 1)
+          coinRect.destroy()
+          coinText.destroy()
+        }
       }
     }
 
     if (!this.spaceShip.health) {
       this.endGame()
+    }
+  }
+
+  coins: [Phaser.Physics.Arcade.Body, Phaser.GameObjects.Text][] = []
+  addCoinDrop(asteroid: Asteroid) {
+    const { x, y } = asteroid.sprite
+    const { gridRect } = this
+    if (this.physics.overlap(gridRect, asteroid.sprite)) {
+      const coinText = this.add
+        .text(x, y, '🪙', { fontSize: 30 })
+        .setPadding(5, 5, 5, 5)
+      const coinRect = this.physics.add.body(
+        coinText.x,
+        coinText.y,
+        coinText.width,
+        coinText.height
+      )
+      this.coins.push([coinRect, coinText])
     }
   }
 
@@ -199,18 +233,20 @@ export class Game extends Phaser.Scene {
     this.physics.world.collide(this.playerSprite, collidingCells)
 
     for (const cell of collidingCells) {
-      const rectA = new Phaser.Geom.Rectangle(
-        cell.body.x,
-        cell.body.y,
-        cell.body.width,
-        cell.body.height
-      )
+      if (cell.body) {
+        const rectA = new Phaser.Geom.Rectangle(
+          cell.body.x,
+          cell.body.y,
+          cell.body.width,
+          cell.body.height
+        )
 
-      if (
-        this.spaceShip.health &&
-        rectA.contains(this.playerSprite.x, this.playerSprite.y)
-      ) {
-        this.spaceShip.health = 0
+        if (
+          this.spaceShip.health &&
+          rectA.contains(this.playerSprite.x, this.playerSprite.y)
+        ) {
+          this.spaceShip.health = 0
+        }
       }
     }
 
@@ -316,7 +352,7 @@ export class Game extends Phaser.Scene {
       y: destinationCell.y + destinationCell.height / 2,
     }
     asteroid.vr = 0.02
-    asteroid.speed = randomInt(50, 200)
+    asteroid.speed = randomInt(25, 150)
     return asteroid
   }
 
