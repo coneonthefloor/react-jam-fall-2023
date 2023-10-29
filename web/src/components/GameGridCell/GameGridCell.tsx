@@ -13,65 +13,13 @@ const GameGridCell = () => {
   const cellRef = useRef<HTMLDivElement>(null)
 
   const [cell, setCell] = useState(null)
-  const [count, setCount] = useState(0)
-  const [countDown, setCountDown] = useState(false)
 
   useEffect(() => {
-    const newCell = new GridCell(cellRef.current)
-    setCell(newCell)
-    dispatch(addCell(newCell))
-
-    setInterval(() => {
-      if (
-        randomInt(0, 30) === 2 &&
-        !countDown &&
-        !count &&
-        state.gameInProgress
-      ) {
-        startDisableCountDown()
-      }
-    }, 3000)
+    const cell = new GridCell(cellRef.current)
+    setCell(cell)
+    dispatch(addCell(cell))
   }, [])
 
-  const startDisableCountDown = () => {
-    setCountDown(true)
-    setCount(disableCount)
-    if (cell) {
-      cell.pending = true
-      cell.disabled = false
-    }
-  }
-
-  const startResetCountDown = () => {
-    setCountDown(true)
-    setCount(resetCount)
-    cell.disabled = true
-    cell.pending = false
-  }
-
-  const enableCell = () => {
-    cell.pending = false
-    cell.disabled = false
-    setCountDown(false)
-  }
-
-  setTimeout(() => {
-    if (count && countDown) {
-      setCount(count - 1)
-    }
-  }, 1000)
-
-  if (cell?.pending && !countDown) {
-    startResetCountDown()
-  }
-
-  if (count === 0 && countDown) {
-    if (cell && !cell.disabled) {
-      startResetCountDown()
-    } else {
-      enableCell()
-    }
-  }
   return (
     <div
       ref={cellRef}
@@ -86,7 +34,7 @@ const GameGridCell = () => {
             : 'text-sky-300'
         }`}
       >
-        {countDown && state.gameInProgress ? count : ''}
+        {/* {state.gameInProgress && (cell?.disabled || cell?.pending) ? count : ''} */}
       </div>
     </div>
   )

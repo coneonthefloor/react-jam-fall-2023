@@ -152,7 +152,7 @@ export class Game extends Phaser.Scene {
 
     const interval = setInterval(() => {
       this.generateAsteroid()
-      if (this.asteroids.length >= 5) {
+      if (this.asteroids.length >= 6) {
         clearInterval(interval)
       }
     }, 5000)
