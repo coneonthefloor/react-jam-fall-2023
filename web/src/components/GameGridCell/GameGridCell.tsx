@@ -3,7 +3,6 @@ import { addCell } from 'src/game.actions'
 import { useGame, useGameDispatch } from 'src/game.context'
 import { randomInt } from 'src/game/core/random'
 import { GridCell } from 'src/game/grid-cell'
-import StatsPanel from '../StatsPanel/StatsPanel'
 
 const disableCount = 3
 const resetCount = 10
@@ -14,7 +13,7 @@ const GameGridCell = () => {
   const cellRef = useRef<HTMLDivElement>(null)
 
   const [cell, setCell] = useState(null)
-  const [count, setCount] = useState(disableCount)
+  const [count, setCount] = useState(0)
   const [countDown, setCountDown] = useState(false)
 
   useEffect(() => {
@@ -22,16 +21,17 @@ const GameGridCell = () => {
     setCell(newCell)
     dispatch(addCell(newCell))
 
-    const interval = setInterval(() => {
-      if (randomInt(0, 20) === 2 && !countDown && state.gameInProgress) {
+    setInterval(() => {
+      if (
+        randomInt(0, 30) === 2 &&
+        !countDown &&
+        !count &&
+        state.gameInProgress
+      ) {
         startDisableCountDown()
       }
-
-      if (!state.gameInProgress) {
-        clearInterval(interval)
-      }
     }, 3000)
-  }, [state.gameInProgress])
+  }, [])
 
   const startDisableCountDown = () => {
     setCountDown(true)
@@ -72,7 +72,6 @@ const GameGridCell = () => {
       enableCell()
     }
   }
-
   return (
     <div
       ref={cellRef}

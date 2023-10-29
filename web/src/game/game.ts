@@ -18,7 +18,8 @@ export class Game extends Phaser.Scene {
   gridRect: Phaser.Types.Physics.Arcade.ImageWithStaticBody
   cells: Map<string, Phaser.Types.Physics.Arcade.ImageWithStaticBody> =
     new Map()
-  emitter: Phaser.GameObjects.Particles.ParticleEmitter
+  spaceShipParticles: Phaser.GameObjects.Particles.ParticleEmitter
+  asteroidParticles: Phaser.GameObjects.Particles.ParticleEmitter
   graphics: Phaser.GameObjects.Graphics
   asteroids: Asteroid[] = []
 
@@ -84,8 +85,22 @@ export class Game extends Phaser.Scene {
       this.cells.set(cell.id, body)
     }
 
-    this.emitter = this.add.particles(0, 0, 'sprites', {
+    this.spaceShipParticles = this.add.particles(0, 0, 'sprites', {
       frame: ['star_small.png', 'star_medium.png'],
+      lifespan: 1000,
+      speed: { min: 150, max: 250 },
+      scale: { start: 0.5, end: 0 },
+      gravityY: 0,
+      blendMode: 'ADD',
+      emitting: false,
+    })
+
+    this.asteroidParticles = this.add.particles(0, 0, 'sprites', {
+      frame: [
+        'meteor_small.png',
+        'meteor_detailedSmall.png',
+        'meteor_squareSmall.png',
+      ],
       lifespan: 1000,
       speed: { min: 150, max: 250 },
       scale: { start: 0.5, end: 0 },
@@ -97,6 +112,13 @@ export class Game extends Phaser.Scene {
     this.graphics = this.add.graphics()
 
     this.generateAsteroid()
+
+    const interval = setInterval(() => {
+      this.generateAsteroid()
+      if (this.asteroids.length >= 5) {
+        clearInterval(interval)
+      }
+    }, 3000)
   }
 
   update() {
@@ -109,6 +131,35 @@ export class Game extends Phaser.Scene {
 
       if (this.physics.overlap(this.playerSprite, activeAsteroid.sprite)) {
         this.spaceShip.damage(this.registry.get('dispatch'))
+        this.asteroidParticles.explode(
+          5,
+          activeAsteroid.sprite.x,
+          activeAsteroid.sprite.y
+        )
+        this.setUpAsteroid(activeAsteroid)
+      } else {
+        const otherAsteroids = this.asteroids.filter(
+          (_) => _.id !== activeAsteroid.id
+        )
+        for (const otherAsteroid of otherAsteroids) {
+          if (
+            this.physics.overlap(activeAsteroid.sprite, otherAsteroid.sprite)
+          ) {
+            this.asteroidParticles.explode(
+              5,
+              activeAsteroid.sprite.x,
+              activeAsteroid.sprite.y
+            )
+            this.asteroidParticles.explode(
+              5,
+              otherAsteroid.sprite.x,
+              otherAsteroid.sprite.y
+            )
+
+            this.setUpAsteroid(otherAsteroid)
+            this.setUpAsteroid(activeAsteroid)
+          }
+        }
       }
     }
 
@@ -221,9 +272,9 @@ export class Game extends Phaser.Scene {
   }
 
   explodePlayer() {
-    this.emitter.setX(this.playerSprite.x)
-    this.emitter.setY(this.playerSprite.y)
-    this.emitter.explode(30)
+    this.spaceShipParticles.setX(this.playerSprite.x)
+    this.spaceShipParticles.setY(this.playerSprite.y)
+    this.spaceShipParticles.explode(30)
   }
 
   endGame() {
@@ -265,7 +316,7 @@ export class Game extends Phaser.Scene {
       y: destinationCell.y + destinationCell.height / 2,
     }
     asteroid.vr = 0.02
-    asteroid.speed = randomInt(100, 300)
+    asteroid.speed = randomInt(50, 200)
     return asteroid
   }
 

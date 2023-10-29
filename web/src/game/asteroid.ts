@@ -5,6 +5,7 @@ export enum AsteroidOrigin {
 }
 
 class Asteroid {
+  id = Math.random().toString()
   vr = 0
   speed = 0
   active = false
