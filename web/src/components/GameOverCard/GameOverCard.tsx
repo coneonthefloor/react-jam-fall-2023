@@ -14,7 +14,7 @@ const GameOverCard = (props: GameOverCardProps) => {
       <TextBanner text="Game Over" />
       <div className="m750:px-5 m750:py-10 min-h-80 min-w-80 my-10 flex w-full max-w-full flex-col items-center justify-between rounded-md border-2 border-black bg-[#1B2947] px-10 py-10 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
         <HighScoreItem
-          imageUrl="https://placehold.co/60"
+          imageUrl={props.shipName.replace(' ', '-').toLowerCase() + '.png'}
           spaceShipName={props.shipName}
           score={props.score}
         />

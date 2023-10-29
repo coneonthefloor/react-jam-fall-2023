@@ -23,7 +23,17 @@ const HighScorePage = () => {
   }
 
   const scores: Score[] = JSON.parse(rawScores)
-  highScores = scores.sort((a, b) => (a.score > b.score ? 0 : 1)).slice(0, 3)
+  highScores = scores
+    .sort((a, b) => {
+      if (a.score > b.score) {
+        return -1
+      }
+      if (a.score < b.score) {
+        return 1
+      }
+      return 0
+    })
+    .slice(0, 3)
 
   return (
     <>
@@ -33,7 +43,7 @@ const HighScorePage = () => {
         {highScores.map(({ score, spaceShip }, i) => (
           <HighScoreItem
             key={i}
-            imageUrl="https://placehold.co/60"
+            imageUrl={spaceShip.replace(' ', '-').toLowerCase() + '.png'}
             spaceShipName={spaceShip}
             score={score}
           />
